@@ -30,7 +30,7 @@ def solve_grb(filepath,log_dir,settings):
 
     sols = []
     objs = []
-    solc = m.getAttr('SolCount')  # 获取多组解是m.Params.PoolSearchMode = 2决定的，会保留多组最优解或近似最优解。
+    solc = m.getAttr('SolCount') 
     mvars = m.getVars()
     #get variable name,
     oriVarNames = [var.varName for var in mvars]
@@ -41,14 +41,14 @@ def solve_grb(filepath,log_dir,settings):
         m.Params.SolutionNumber = sn
         sols.append(np.array(m.Xn))
         
-        # 获取目标函数数量
+   
         num_obj = m.NumObj if hasattr(m, 'NumObj') else 1
         if num_obj > 1:
-            # 多目标情况下获取所有目标函数值
+          
             obj_vals = [m.getObjective(i).getValue() for i in range(num_obj)]
             objs.append(obj_vals)
         else:
-            # 单目标情况下获取PoolObjVal
+           
             objs.append(m.PoolObjVal)
 
     sols = np.array(sols,dtype=np.float32)
@@ -92,7 +92,7 @@ if __name__ == '__main__':
     parser.add_argument('--maxStoredSol', type=int, default=1)
     parser.add_argument('--threads', type=int, default=1)
     args = parser.parse_args()
-    task=f'train'  # 任务名称
+    task=f'train' 
 
     dataDir = args.dataDir
     INS_DIR = os.path.join(dataDir,f'instance/{task}')
@@ -148,3 +148,4 @@ if __name__ == '__main__':
     for p in ps:
         p.join()
     print('done')
+
