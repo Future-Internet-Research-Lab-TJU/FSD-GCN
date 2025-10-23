@@ -4,7 +4,7 @@ import torch_geometric
 class GNNPolicy(torch.nn.Module):
     
     def __init__(self):
-        """初始化模型结构"""
+     
         super().__init__() 
         emb_size = 64
         cons_nfeats = 4 
@@ -14,7 +14,7 @@ class GNNPolicy(torch.nn.Module):
         self.cons_embedding = torch.nn.Sequential(
             torch.nn.LayerNorm(cons_nfeats),
             torch.nn.Linear(cons_nfeats, emb_size),
-            torch.nn.ReLU(),  # ReLU激活函数
+            torch.nn.ReLU(), 
             torch.nn.Linear(emb_size, emb_size), 
             torch.nn.ReLU(), 
         )
@@ -120,4 +120,5 @@ class BipartiteGraphConvolution(torch_geometric.nn.MessagePassing):
             + self.feature_module_right(node_features_j) 
         )
         return output
+
 
