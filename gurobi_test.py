@@ -26,7 +26,7 @@ def collect(ins_dir, topodir, bg_dir):
 if __name__ == '__main__':
     multiprocessing.set_start_method('spawn')
 
-    task=f'test'  # 任务名称
+    task=f'test' 
     BG_DIR =f'./dataset/{task}/BG'
     INS_DIR = f'./instance/{task}'
     TOPO_DIR = f'./Topology/{task}'
