@@ -1,0 +1,62 @@
+for i in range(11):
+    with open(f'./export_lp/test/{i}.py','w') as f:
+        f.write(f"import re\n")
+        f.write("import gurobipy as gp\n")
+        f.write("from gurobipy import GRB\n\n")
+        f.write(f"with open('./Topology/test/{i}.gml', 'r', encoding='utf-8') as fp:\n")
+        f.write("\tcontent = fp.read()\n")
+        f.write("\tnodes = []\n")
+        f.write(r"	node_pattern = re.compile(r'node\s*\[\s*\n\s*id\s*(\d+)\s*\n\s*label\s*\"([^\"]+)\"')")
+        f.write("\n\tfor match in node_pattern.finditer(content):\n")
+        f.write("\t\tnodes.append({'id': match.group(1)})\n")
+        f.write("\n")
+        f.write("\tedges = []\n")
+        f.write(r"	edge_pattern = re.compile(r'edge\s*\[\s*\n\s*source\s*(\d+)\s*\n\s*target\s*(\d+)')")
+        f.write("\n\tfor match in edge_pattern.finditer(content):\n")
+        f.write("\t\tedges.append({'source': match.group(1), 'target': match.group(2)})\n\n")
+
+        f.write("num_nodes = len(nodes)\n")
+        f.write("num_edges = len(edges)\n\n")
+
+        f.write("# create model\n")
+        f.write("model = gp.Model()\n")
+        
+        f.write("v = model.addVars(num_nodes, vtype=GRB.BINARY, name='v')\n")
+        f.write("l = model.addVars(num_edges, vtype=GRB.BINARY, name='l')\n")
+
+        f.write("n_cons = 1\n\n")
+        f.write("lki = [[0 for _ in range(num_nodes)] for _ in range(num_edges)]\n")
+        f.write("model.addConstr(sum(v[i] for i in range(num_nodes)) <= num_nodes , f'c{n_cons}')\n")
+        f.write("n_cons += 1\n")
+        f.write("for k, edge in enumerate(edges):\n")
+        f.write("\tsource = int(edge['source'])\n")
+        f.write("\ttarget = int(edge['target'])\n")
+        f.write("\tlki[k][source] = 1\n")
+        f.write("\tlki[k][target] = 1\n")
+
+        f.write("\tfor i in range(num_nodes):\n")
+        f.write("\t\tif i != source and i != target:\n")
+        f.write("\t\t\tlki[k][i] == 0\n\n")
+
+        f.write("for k , edge in enumerate(edges):\n")
+        f.write("\tsource = int(edge['source'])\n")
+        f.write("\ttarget = int(edge['target'])\n")
+        f.write("\tmodel.addConstr(l[k] <= v[source] + v[target], f'c{n_cons}')\n")
+        f.write("\tn_cons += 1\n")
+        f.write("for k , edge in enumerate(edges):\n")
+        f.write("\tsource = int(edge['source'])\n")
+        f.write("\ttarget = int(edge['target'])\n")
+        f.write("\tmodel.addConstr(l[k] >= v[source], f'c{n_cons}')\n")
+        f.write("\tn_cons += 1\n")
+        f.write("for k , edge in enumerate(edges):\n")
+        f.write("\tsource = int(edge['source'])\n")
+        f.write("\ttarget = int(edge['target'])\n")
+        f.write("\tmodel.addConstr(l[k] >= v[target], f'c{n_cons}')\n")
+        f.write("\tn_cons += 1\n\n")
+
+        f.write("model.setObjectiveN(sum(v[i] for i in range(num_nodes)), index=0, priority=1, name='obj1')\n")
+        f.write("model.setObjectiveN(sum(-l[k] for k in range(num_edges)), index=1, priority=3, name='obj2')\n")
+        f.write("model.setObjectiveN(sum(sum(lki[k][i] * v[i] for i in range(num_nodes)) for k in range(num_edges)), index=2, priority=2, name='obj3')\n\n")
+
+        f.write(f"model.write('./instance/test/{i}.lp')\n")
+
